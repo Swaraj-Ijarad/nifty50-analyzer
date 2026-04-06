@@ -52,10 +52,19 @@ selected_stock = st.session_state.stock
 # -------------------------
 data = yf.download(selected_stock, period="6mo", progress=False)
 
+# 🔥 HANDLE EMPTY DATA (VERY IMPORTANT)
+if data is None or data.empty:
+    st.error("⚠️ Data not available right now. Please try another stock.")
+    st.stop()
+
 if isinstance(data.columns, pd.MultiIndex):
     data.columns = data.columns.get_level_values(0)
 
 data = data.dropna()
+
+if len(data) < 2:
+    st.warning("⚠️ Not enough data to analyze this stock.")
+    st.stop()
 
 # -------------------------
 # PRICE + OHLC
