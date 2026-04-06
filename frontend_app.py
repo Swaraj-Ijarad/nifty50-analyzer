@@ -247,20 +247,6 @@ with right:
                 unsafe_allow_html=True
             )
 
-    # 🚀 LOSERS
-    with col2:
-        st.markdown("### 🔴 Top Losers")
-        for _, row in losers.iterrows():
-            name = company_names.get(row["Stock"], row["Stock"])
-            st.markdown(
-                f"""
-                <div style="padding:10px; border-radius:10px; margin-bottom:8px; background-color:#842029; color:white">
-                    <b>{name}</b><br>
-                    ₹{row['Price']:.2f} &nbsp;&nbsp; ▼ {row['Change']:.2f}%
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
 # -------------------------
 # RANKING
 # -------------------------
