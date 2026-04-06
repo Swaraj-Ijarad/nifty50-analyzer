@@ -13,18 +13,31 @@ st.title("📊 NIFTY 50 Pro Analyzer")
 # LIVE NIFTY 50 (NSE CSV)
 # -------------------------
 @st.cache_data(ttl=86400)
+@st.cache_data(ttl=86400)
 def get_nifty50():
     url = "https://archives.nseindia.com/content/indices/ind_nifty50list.csv"
     try:
         df = pd.read_csv(url, storage_options={"User-Agent": "Mozilla/5.0"})
-        return [s + ".NS" for s in df["Symbol"].tolist()]
+
+        symbols = df["Symbol"].tolist()
+        names = df["Company Name"].tolist()
+
+        stocks = [s + ".NS" for s in symbols]
+        company_map = dict(zip(stocks, names))
+
+        return stocks, company_map
+
+    except:
+        fallback_stocks = ["RELIANCE.NS","TCS.NS","INFY.NS"]
+        fallback_map = {s: s for s in fallback_stocks}
+        return fallback_stocks, fallback_map
     except:
         return [
             "RELIANCE.NS","TCS.NS","INFY.NS","HDFCBANK.NS","ICICIBANK.NS",
             "SBIN.NS","ITC.NS","HINDUNILVR.NS","LT.NS","KOTAKBANK.NS"
         ]
 
-stocks = get_nifty50()
+stocks, company_names = get_nifty50()
 
 # -------------------------
 # SESSION STATE
@@ -37,14 +50,20 @@ if "stock" not in st.session_state:
 # -------------------------
 st.sidebar.title("📈 NIFTY 50")
 
+st.sidebar.markdown("## 📈 NIFTY 50")
+
 search = st.sidebar.text_input("🔍 Search stock")
 
 filtered = [s for s in stocks if search.upper() in s] if search else stocks
 
 for s in filtered:
-    if st.sidebar.button(s):
-        st.session_state.stock = s
+    name = company_names.get(s, s)
 
+    if s == st.session_state.stock:
+        st.sidebar.markdown(f"👉 **{name}**")
+    else:
+        if st.sidebar.button(name):
+            st.session_state.stock = s
 selected_stock = st.session_state.stock
 
 # -------------------------
