@@ -184,7 +184,7 @@ with left:
 # -------------------------
 # RIGHT PANEL (GAINERS/LOSERS FIXED)
 # -------------------------
-
+with right:
 
   st.subheader("🔥 Top Movers (Today)")
 
