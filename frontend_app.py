@@ -13,9 +13,9 @@ st.title("📊 NIFTY 50 Pro Analyzer")
 # LIVE NIFTY 50 (NSE CSV)
 # -------------------------
 @st.cache_data(ttl=86400)
-@st.cache_data(ttl=86400)
 def get_nifty50():
     url = "https://archives.nseindia.com/content/indices/ind_nifty50list.csv"
+
     try:
         df = pd.read_csv(url, storage_options={"User-Agent": "Mozilla/5.0"})
 
@@ -27,16 +27,11 @@ def get_nifty50():
 
         return stocks, company_map
 
-    except:
-        fallback_stocks = ["RELIANCE.NS","TCS.NS","INFY.NS"]
+    except Exception:
+        fallback_stocks = ["RELIANCE.NS", "TCS.NS", "INFY.NS"]
         fallback_map = {s: s for s in fallback_stocks}
-        return fallback_stocks, fallback_map
-    except:
-        return [
-            "RELIANCE.NS","TCS.NS","INFY.NS","HDFCBANK.NS","ICICIBANK.NS",
-            "SBIN.NS","ITC.NS","HINDUNILVR.NS","LT.NS","KOTAKBANK.NS"
-        ]
 
+        return fallback_stocks, fallback_map
 stocks, company_names = get_nifty50()
 
 # -------------------------
