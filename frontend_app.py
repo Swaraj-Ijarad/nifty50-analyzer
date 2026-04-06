@@ -186,45 +186,72 @@ with left:
 # -------------------------
 with right:
 
-    st.subheader("🔥 Top Movers (Today)")
+  st.subheader("🔥 Top Movers (Today)")
 
-    movers = []
+movers = []
 
-    for stock in stocks:
-        try:
-            d = yf.download(stock, period="5d", interval="1d", progress=False)
+for stock in stocks:
+    try:
+        d = yf.download(stock, period="5d", interval="1d", progress=False)
 
-            if isinstance(d.columns, pd.MultiIndex):
-                d.columns = d.columns.get_level_values(0)
+        if isinstance(d.columns, pd.MultiIndex):
+            d.columns = d.columns.get_level_values(0)
 
-            d = d.dropna()
+        d = d.dropna()
+        closes = d["Close"].dropna()
 
-            closes = d["Close"].dropna()
-
-            if len(closes) < 2:
-                continue
-
-            prev_close = float(closes.iloc[-2])
-            latest_close = float(closes.iloc[-1])
-
-            change = (latest_close - prev_close) / prev_close
-
-            movers.append([stock, latest_close, change])
-
-        except:
+        if len(closes) < 2:
             continue
 
-    df_movers = pd.DataFrame(movers, columns=["Stock", "Price", "Change"])
+        prev_close = float(closes.iloc[-2])
+        latest_close = float(closes.iloc[-1])
 
-    if not df_movers.empty:
-        df_movers = df_movers.sort_values(by="Change", ascending=False)
+        change = ((latest_close - prev_close) / prev_close) * 100
 
-        st.markdown("### 🚀 Gainers")
-        st.dataframe(df_movers.head(5), use_container_width=True)
+        movers.append([stock, latest_close, change])
 
-        st.markdown("### 🔻 Losers")
-        st.dataframe(df_movers.tail(5), use_container_width=True)
+    except:
+        continue
 
+df_movers = pd.DataFrame(movers, columns=["Stock", "Price", "Change"])
+
+if not df_movers.empty:
+    df_movers = df_movers.sort_values(by="Change", ascending=False)
+
+    gainers = df_movers.head(5)
+    losers = df_movers.tail(5)
+
+    col1, col2 = st.columns(2)
+
+    # 🚀 GAINERS
+    with col1:
+        st.markdown("### 🟢 Top Gainers")
+        for _, row in gainers.iterrows():
+            name = company_names.get(row["Stock"], row["Stock"])
+            st.markdown(
+                f"""
+                <div style="padding:10px; border-radius:10px; margin-bottom:8px; background-color:#0f5132; color:white">
+                    <b>{name}</b><br>
+                    ₹{row['Price']:.2f} &nbsp;&nbsp; ▲ {row['Change']:.2f}%
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+    # 🚀 LOSERS
+    with col2:
+        st.markdown("### 🔴 Top Losers")
+        for _, row in losers.iterrows():
+            name = company_names.get(row["Stock"], row["Stock"])
+            st.markdown(
+                f"""
+                <div style="padding:10px; border-radius:10px; margin-bottom:8px; background-color:#842029; color:white">
+                    <b>{name}</b><br>
+                    ₹{row['Price']:.2f} &nbsp;&nbsp; ▼ {row['Change']:.2f}%
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 # -------------------------
 # RANKING
 # -------------------------
