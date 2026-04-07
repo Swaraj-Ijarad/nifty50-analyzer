@@ -250,37 +250,43 @@ with right:
 # -------------------------
 # RANKING
 # -------------------------
-st.subheader("📊 Ranking (3M Performance)")
+with left:
 
-ranking = []
+    # chart
+    st.plotly_chart(fig, use_container_width=True)
 
-for stock in stocks:
-    try:
-        d = yf.download(stock, period="3mo", progress=False)
+    # 🔥 MOVE RANKING HERE
+    st.subheader("📊 Ranking (3M Performance)")
 
-        if isinstance(d.columns, pd.MultiIndex):
-            d.columns = d.columns.get_level_values(0)
+    ranking = []
 
-        d = d.dropna()
+    for stock in stocks:
+        try:
+            d = yf.download(stock, period="3mo", progress=False)
 
-        if len(d) < 2:
+            if isinstance(d.columns, pd.MultiIndex):
+                d.columns = d.columns.get_level_values(0)
+
+            d = d.dropna()
+
+            if len(d) < 2:
+                continue
+
+            start = float(d["Close"].iloc[0])
+            end = float(d["Close"].iloc[-1])
+
+            change = (end - start) / start
+
+            ranking.append([stock, change])
+
+        except:
             continue
 
-        start = float(d["Close"].iloc[0])
-        end = float(d["Close"].iloc[-1])
+    df_rank = pd.DataFrame(ranking, columns=["Stock", "Return"])
 
-        change = (end - start) / start
-
-        ranking.append([stock, change])
-
-    except:
-        continue
-
-df_rank = pd.DataFrame(ranking, columns=["Stock", "Return"])
-
-if not df_rank.empty:
-    df_rank = df_rank.sort_values(by="Return", ascending=False)
-    st.dataframe(df_rank)
+    if not df_rank.empty:
+        df_rank = df_rank.sort_values(by="Return", ascending=False)
+        st.dataframe(df_rank)
 
 # -------------------------
 # TIME
