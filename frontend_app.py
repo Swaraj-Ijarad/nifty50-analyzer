@@ -252,9 +252,6 @@ with right:
 # -------------------------
 with left:
 
-    # chart
-    st.plotly_chart(fig, use_container_width=True)
-
     # 🔥 MOVE RANKING HERE
     st.subheader("📊 Ranking (3M Performance)")
 
